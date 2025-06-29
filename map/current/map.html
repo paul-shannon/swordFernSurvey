@@ -88,6 +88,36 @@ function createINatMarkersToggle(map) {
   return controlButton;
   }
 //------------------------------------------------------------
+function createUWMarkersToggle(map) {
+  const controlButton = document.createElement("button");
+
+  // Set CSS for the control.
+  controlButton.style.backgroundColor = "#fff";
+  controlButton.style.border = "2px solid #fff";
+  controlButton.style.borderRadius = "3px";
+  controlButton.style.boxShadow = "0 2px 6px rgba(0,0,0,.3)";
+  controlButton.style.color = "rgb(25,25,25)";
+  controlButton.style.cursor = "pointer";
+  controlButton.style.fontFamily = "Roboto,Arial,sans-serif";
+  controlButton.style.fontSize = "16px";
+  controlButton.style.lineHeight = "38px";
+  controlButton.style.margin = "8px 0 22px";
+  controlButton.style.padding = "0 5px";
+  controlButton.style.textAlign = "center";
+  controlButton.textContent = "UW 2025 Reports";
+  controlButton.type = "button";
+  controlButton.addEventListener("click", () => {
+      if(uwMarkers[0].map == null){
+         uwMarkers.forEach(function(m) {m.map = map;})
+         }
+      else{
+         uwMarkers.forEach(function(m) {m.map = null;})
+         }
+     });
+  return controlButton;
+
+} // createUWMarkersToggle
+//------------------------------------------------------------
 function createCountiesToggle(map) 
 {
    const controlButton = document.createElement("button");
@@ -216,7 +246,8 @@ async function initMap() {
        mapId: "DEMO_MAP_ID"
        });
 
-   drawFerns(map)
+   drawInaturalistSites(map)
+   drawUWSites(map)
 
       //------------------
       // load county layer
@@ -226,7 +257,7 @@ async function initMap() {
    let jsonFile1 = "WA_County_Boundaries.geojson"
    countyLayer.loadGeoJson(jsonFile1)
    window.countyLayer = countyLayer;          
-   countyLayer.setMap(map);
+   countyLayer.setMap(null);
 
       //-----------------------
       // load state parks layer
@@ -235,7 +266,7 @@ async function initMap() {
    var parksLayer = new google.maps.Data()
    let jsonFile2 = "waParksBoundaries.geojson"
    parksLayer.loadGeoJson(jsonFile2)
-   parksLayer.setMap(map);
+   parksLayer.setMap(null);
    window.parksLayer = parksLayer;
 
       //-----------------------
@@ -244,7 +275,7 @@ async function initMap() {
     var dnrLayer  = new google.maps.Data();
     let jsonFile3 = "WA_DNR_Managed_Land_Parcels.geojson"
     dnrLayer.loadGeoJson(jsonFile3)
-    dnrLayer.setMap(map);
+      dnrLayer.setMap(null);
     window.dnrLayer = dnrLayer
 
       //----------------------------------
@@ -255,8 +286,15 @@ async function initMap() {
    const centerControlDiv = document.createElement("div");
    const label = createToggleButtonsLabel()
    centerControlDiv.appendChild(label)
+
+   const uwMarkersToggleButton = createUWMarkersToggle(map);
+   centerControlDiv.appendChild(uwMarkersToggleButton)
+
    const inatMarkersToggleButton = createINatMarkersToggle(map);
    centerControlDiv.appendChild(inatMarkersToggleButton)
+
+
+
 
    const countiesToggleButton = createCountiesToggle(map);
    centerControlDiv.appendChild(countiesToggleButton)
@@ -271,7 +309,7 @@ async function initMap() {
 
 } // initMap
 //------------------------------------------------------------
-async function drawFerns(map)
+async function drawInaturalistSites(map)
 {
   console.log("report count: " + window.reports.length)
   let options = google.maps.marker.PinElementOptions
@@ -280,7 +318,6 @@ async function drawFerns(map)
       scale: 0.5,
       background: '#FBBC04'
       });
-
 
   window.reports.forEach(function(report){
       var iNatLayer = new google.maps.Data()
@@ -292,7 +329,7 @@ async function drawFerns(map)
            scale: 0.75});    
       const marker = new google.maps.marker.AdvancedMarkerElement({
           position: {lat:  report["lat"], lng: report["lon"]},
-          map: map,
+          map: null,
           title: "fump",
           content: pinRed.element,
           gmpClickable: true
@@ -318,9 +355,66 @@ async function drawFerns(map)
       iNatMarkers.push(marker)
       }) // forEach
 
-    } // drawFerns
+} // drawInaturalistSites
 //------------------------------------------------------------
+async function drawUWSites(map)
+{
+  console.log("uw site count: " + window.uwObs.length)
+  let options = google.maps.marker.PinElementOptions
+  const pinBlue = new google.maps.marker.PinElement({ background: "#0000FF" });    
+  let pin = new google.maps.marker.PinElement({
+      scale: 0.5,
+      background: '#FBBC04'
+      });
 
+  window.uwObs.forEach(function(obs){
+      var uwLayer = new google.maps.Data()
+      uwLayer.setMap(map);
+      window.uwLayer = uwLayer;
+      var size = 5; 
+      const pinBlue = new google.maps.marker.PinElement({
+           background: "#40D5FF", // "#0000FF",
+           scale: 1.25});    
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: {lat:  obs["lat"], lng: obs["lon"]},
+          map: map,
+          title: "fump",
+          content: pinBlue.element,
+          gmpClickable: true
+          })
+      let infoHTML =  "<h3> UW observation: " + obs["siteName"] + "</h3>" +
+             "<ul>" +
+               "<li> by: " + obs["observer"] +
+               "<li> date: " + obs["date"] +
+               "<li> area: " + obs["area"] +
+               "<li> length: " + obs["length"] +
+               "<li> width: " + obs["width"] +
+               "<li> healthy ferns: " + obs["healthyFernCount"] +
+               "<li> sick or dead ferns: " + obs["sickOrDeadFernCount"] +
+               "<li> class 1: " + obs["dead.Class.1"] +
+               "<li> class 2: " + obs["dead.Class.2"] +
+               "<li> class 3: " + obs["dead.Class.3"] +
+               "<li> class 4: " + obs["dead.Class.4"] +
+               "<li> canopy type: " + obs["canopyType"] +
+               "<li> canopy cover: " + obs["canopyDensity"] +
+               "</ul>" +
+               "<p>" + 
+          obs["notes"];
+          //"<br>" + 
+          //"<img src='" + report["url"] + "'>"
+      //console.log("description: " + report["description"])
+      let infoWindow = new google.maps.InfoWindow();
+      marker.addListener("click", ({ domEvent, latLng }) => {
+         const {target} = domEvent;
+         infoWindow.close();
+         infoWindow.setContent(infoHTML);
+         infoWindow.open(marker.map, marker);
+         });
+      uwMarkers.push(marker)
+      }) // forEach
+
+} // drawUWSites
+//------------------------------------------------------------
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkGwPVB2OLaBmQjLQvkoLv5M1ZQU64V7A&callback=initMap&libraries=marker&loading=async">

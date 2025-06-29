@@ -86,12 +86,15 @@ standardizeUWTable <- function(tbl)
    tbl.std$lon <- lon.all
    tbl.std$date <- date
    tbl.std$time <- time
+   tbl.std$area <- tbl.std$width * tbl.std$length
+
    tbl.std$siteName <- gsub("#", "", tbl$siteName)
 
-   coi <- c("observer", "siteName", "lat", "lon", "date", "time", "elevation", "width",
-           "length", "slope", "aspect", "canopyType", "canopyDensity",
-           "healthFernCount", "sickOrDeadFernCount", "dead.Class.1", "dead.Class.2",
-           "dead.Class.3", "dead.Class.4", "notes")
+   coi <- c("observer", "siteName", "lat", "lon", "date", "time", "elevation",
+            "area", "width",
+            "length", "slope", "aspect", "canopyType", "canopyDensity",
+            "healthyFernCount", "sickOrDeadFernCount", "dead.Class.1", "dead.Class.2",
+            "dead.Class.3", "dead.Class.4", "notes")
    return(tbl.std[, coi])
 
 
@@ -123,7 +126,7 @@ dim(tbl2)  # 6 18
 wdth(80)
 colnames(tbl2)
 colnames(tbl2)[6:7] <- c("width", "length")
-colnames(tbl2)[12:13] <- c("healthFernCount", "sickOrDeadFernCount")
+colnames(tbl2)[12:13] <- c("healthyFernCount", "sickOrDeadFernCount")
 tbl2$location
 
 runTests()
