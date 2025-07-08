@@ -1,5 +1,6 @@
 library(jsonlite)
 library(sp)
+library(parzer)
 library(RUnit)
 options(digits=10)
 #--------------------------------------------------------------------------------
@@ -14,7 +15,7 @@ standardizeLatLong <- function(s)
       s <- trimws(gsub("°", "", s))
       tokens <- strsplit(s, split=" +")[[1]]
       lat <- as.numeric(tokens[1])
-      lon <- -1 * as.numeric(tokens[2])
+      lon <- -1 * abs(as.numeric(tokens[2]))
       return(list(lat=lat, lon=lon))
       }
 
@@ -61,10 +62,11 @@ test_standardizeLatLong <- function()
   checkEqualsNumeric(x$lon, -121.9919, tol=1e-6)
 
   x.all <- lapply(tbl2$location, standardizeLatLong)
+  browser()
   for(x in x.all){
      printf("lat: %f  lon: %f", x$lat, x$lon)
-     checkTrue(x$lat > 47)
-     checkTrue(x$lat < 47.7)
+     checkTrue(x$lat > 46)
+     checkTrue(x$lat < 49.0)
      checkTrue(x$lon < -121.8)
      checkTrue(x$lon > -122.5)
      } # for x
@@ -121,6 +123,8 @@ tbl <- fromJSON("inatReports.json")
 dim(tbl) # 176 6
 
 f <- "uwReports.tsv"
+f <- "../../surveyDataDownloads/survey-08jul-2.tsv"
+file.exists(f)
 tbl2 <- read.table(f, sep="\t", comment="", header=TRUE, strip.white=TRUE)
 dim(tbl2)  # 6 18
 wdth(80)

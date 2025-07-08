@@ -21,9 +21,9 @@ PROJ = fernSurvey2025
 DEST = paulshannnon@pshannon.net:public_html/pshannon.net/$(PROJ)
 
 publish:
-	scp map4.html $(DEST)/index.html
+	scp map.html $(DEST)/index.html
 	scp *.geojson $(DEST)/
-	scp fernReports.json $(DEST)/
+	scp *.json $(DEST)/
 
 view:
 	@echo disable CORS in chrome
