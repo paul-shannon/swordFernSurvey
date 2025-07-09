@@ -246,6 +246,10 @@ async function initMap() {
        mapId: "DEMO_MAP_ID"
        });
 
+    map.addListener("click", (mapsMouseEvent) => {
+      console.log(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
+      });
+      
    drawInaturalistSites(map)
    drawUWSites(map)
 
@@ -330,7 +334,7 @@ async function drawInaturalistSites(map)
       const marker = new google.maps.marker.AdvancedMarkerElement({
           position: {lat:  report["lat"], lng: report["lon"]},
           map: null,
-          title: "fump",
+          title: report["siteName"],
           content: pinRed.element,
           gmpClickable: true
           })
@@ -378,7 +382,7 @@ async function drawUWSites(map)
       const marker = new google.maps.marker.AdvancedMarkerElement({
           position: {lat:  obs["lat"], lng: obs["lon"]},
           map: map,
-          title: "fump",
+          title: obs["siteName"],
           content: pinBlue.element,
           gmpClickable: true
           })
