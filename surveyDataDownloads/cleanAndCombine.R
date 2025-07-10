@@ -136,4 +136,5 @@ tbl <- unique(tbl)
 printf("writing %d rows, %d columns to uwObs.json", nrow(tbl), ncol(tbl))
 jsonText <- toJSON(tbl)
 writeLines(jsonText, "uwObs.json")
+printf("DO THIS: cp uwObs.json ../../map/current/")
 
