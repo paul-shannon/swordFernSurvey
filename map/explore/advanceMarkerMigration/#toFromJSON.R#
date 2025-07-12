@@ -1,0 +1,6 @@
+library(jsonlite)
+tbl <- fromJSON("fernReports.json")
+dim(tbl)
+
+f <- "uwReports.tsv"
+tbl2 <- read.table(f, sep="\t", comment="", header=TRUE)

@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <link rel="shortcut icon" href="#" />
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
     <title>Fern Reports</title>
     <style>
       html, body {
@@ -19,9 +20,10 @@
   </head>
   <body>
     <div id="map"></div>
-    <script>
+    <script type="module">
       var iNatMarkers = [];
       var uwMarkers = [];
+      //import {MarkerClusterer} from "@googlemaps/markerclusterer";
 
       function readINaturalistData(){
          console.log("entering readINaturalistData")
@@ -236,8 +238,11 @@ function createStateParksToggle(map)
 } // createStateParksToggle
 //------------------------------------------------------------
 async function initMap() {
-   const {AdvancedMarkerElement, PinElement, InfoWindow} = await google.maps.importLibrary("marker");
    const {Map} = await google.maps.importLibrary("maps");
+   const {AdvancedMarkerElement, PinElement, InfoWindow} = await google.maps.importLibrary("marker");
+   //const { MarkerClusterer } = await google.maps.importLibrary("marker");
+   //const {MarkerClusterer} = await google.maps.importLibrary("markerclusterer");
+   // import { MarkerClusterer } from "@googlemaps/markerclusterer";
      
    var map = new google.maps.Map(document.getElementById('map'), {
        zoom: 7,
@@ -386,39 +391,29 @@ async function drawUWSites(map)
           content: pinBlue.element,
           gmpClickable: true
           })
-      let infoHTML =  "<h3> UW observation: " + obs["siteName"] + "</h3>" +
-             "<ul>" +
-               "<li> by: " + obs["observer"] +
-               "<li> date: " + obs["date"] +
-               "<li> area: " + obs["area"] +
-               "<li> length: " + obs["length"] +
-               "<li> width: " + obs["width"] +
-               "<li> healthy ferns: " + obs["healthyFernCount"] +
-               "<li> sick or dead ferns: " + obs["sickOrDeadFernCount"] +
-               "<li> class 1: " + obs["dead.Class.1"] +
-               "<li> class 2: " + obs["dead.Class.2"] +
-               "<li> class 3: " + obs["dead.Class.3"] +
-               "<li> class 4: " + obs["dead.Class.4"] +
-               "<li> canopy type: " + obs["canopyType"] +
-               "<li> canopy cover: " + obs["canopyDensity"] +
-               "</ul>" +
-               "<p>" + 
-          obs["notes"];
-          //"<br>" + 
-          //"<img src='" + report["url"] + "'>"
-      //console.log("description: " + report["description"])
+    let infoHTML = "<h3>UW observation: ";
+      infoHTML += obs['siteName'];
+      infoHTML += "</h3>"; 
       let infoWindow = new google.maps.InfoWindow();
-      marker.addListener("click", ({ domEvent, latLng }) => {
+      marker.addListener("click", function(domEvent, latLng){
          const {target} = domEvent;
          infoWindow.close();
          infoWindow.setContent(infoHTML);
          infoWindow.open(marker.map, marker);
          });
       uwMarkers.push(marker)
-      }) // forEach
+      })// forEach
+
+   // var mc = MarkerClusterer(uwMarkers, map);
+   //new markerClusterer.MarkerClusterer({uwMarkers, map})
+   new markerClusterer.MarkerClusterer({uwMarkers, map})
+   //const markerCluster = new MarkerClusterer({map, uwMarkers });
 
 } // drawUWSites
 //------------------------------------------------------------
+//        export default initMap;
+        window.initMap = initMap;
+
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkGwPVB2OLaBmQjLQvkoLv5M1ZQU64V7A&callback=initMap&libraries=marker&loading=async">

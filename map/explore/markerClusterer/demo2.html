@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="your-google-maps-container" style="width: 100%; height: 600px"></div>
+
+        <script type="module">
+            import { MarkerClusterer } from "https://cdn.skypack.dev/@googlemaps/markerclusterer@2.0.3";
+            async function initMap() {
+                const {Map} = await google.maps.importLibrary("maps");
+                const {AdvancedMarkerElement, PinElement, InfoWindow} = await google.maps.importLibrary("marker");
+                const map = new google.maps.Map(document.getElementById("your-google-maps-container"), {
+                    mapId: "DEMO2_MAP_ID",
+                    center: { lat: 46.1176208, lng: 14.8671412 },
+                    zoom: 8.5,
+                    disableDefaultUI: true,
+                   });
+
+                const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                const yourMarkers = coordinates.map((position, i) => {
+                    const label = labels[i % labels.length];
+                    const pinGlyph = new google.maps.marker.PinElement({
+                       glyph: label,
+                       glyphColor: "white",
+                       });
+                   const marker = new google.maps.marker.AdvancedMarkerElement({
+                       position,
+                       map: map,
+                       content: pinGlyph.element,
+                      });
+                  return marker;
+                  });
+
+                const yourCluster = new MarkerClusterer({
+                    map: map,
+                    markers: yourMarkers
+                    }); // MarkerClusterer
+            } // initMap
+
+              const coordinates = [
+                { lat: 45.51698897666811, lng: 13.569763482476969, info: "Coordinate 1" },
+                { lat: 45.530799151329255, lng: 13.649157423409125, info: "Coordinate 2" },
+                { lat: 45.52550345079001, lng: 13.597301289331448, info: "Coordinate 3" },
+                { lat: 46.36572773115262, lng: 14.10740802891841, info: "Coordinate 4" },
+                { lat: 46.421743820980616, lng: 15.856193372578861, info: "Coordinate 5" },
+                { lat: 46.68333311555929, lng: 16.220405662581804, info: "Coordinate 6" },
+                { lat: 46.64288069309906, lng: 16.0463909344671, info: "Coordinate 7" },
+                ];
+
+            window.initMap = initMap;
+        </script>
+        <script defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkGwPVB2OLaBmQjLQvkoLv5M1ZQU64V7A&callback=initMap"></script>
+    </body>
+</html>

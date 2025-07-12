@@ -5,6 +5,6 @@ account: paulshannon
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 14898876
-bundleId: 10425567
+bundleId: 10550892
 url: https://paulshannon.shinyapps.io/fernSurvey/
 version: 1

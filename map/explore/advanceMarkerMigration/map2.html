@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="#" />
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <title>Fern Reports</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var iNatMarkers = [];
+      function readFernData(){
+         console.log("entering readFernData")
+         $.getJSON( "fernReports.json", function(json) {
+             window.reports = json
+         })
+       .done(function(){
+          console.log("getJSON done")
+          console.log("fern count: " + window.reports.length)
+          })
+       .fail(function(){
+          console.log("getJSON failure")
+       })
+     } // readFernData
+
+
+// await readTreeData()
+
+$(document).ready(function(){
+  readFernData()
+  });
+
+      
+//------------------------------------------------------------
+function createINatMarkersToggle(map) {
+  const controlButton = document.createElement("button");
+
+  // Set CSS for the control.
+  controlButton.style.backgroundColor = "#fff";
+  controlButton.style.border = "2px solid #fff";
+  controlButton.style.borderRadius = "3px";
+  controlButton.style.boxShadow = "0 2px 6px rgba(0,0,0,.3)";
+  controlButton.style.color = "rgb(25,25,25)";
+  controlButton.style.cursor = "pointer";
+  controlButton.style.fontFamily = "Roboto,Arial,sans-serif";
+  controlButton.style.fontSize = "16px";
+  controlButton.style.lineHeight = "38px";
+  controlButton.style.margin = "8px 0 22px";
+  controlButton.style.padding = "0 5px";
+  controlButton.style.textAlign = "center";
+  controlButton.textContent = "Toggle iNaturalist Reports";
+  controlButton.type = "button";
+  controlButton.addEventListener("click", () => {
+      if(iNatMarkers[0].map == null){
+         iNatMarkers.forEach(function(m) {m.map = map;})
+         }
+      else{
+         iNatMarkers.forEach(function(m) {m.map = null;})
+         }
+     });
+  return controlButton;
+  }
+//------------------------------------------------------------
+async function initMap() {
+   const {AdvancedMarkerElement, PinElement, InfoWindow} = await google.maps.importLibrary("marker");
+   const {Map} = await google.maps.importLibrary("maps");
+     
+   var map = new google.maps.Map(document.getElementById('map'), {
+       zoom: 7,
+       center: {lat: 47.2277, lng: -122.3555},
+       mapTypeId: google.maps.MapTypeId.TERRAIN,
+       mapId: "DEMO_MAP_ID"
+       });
+
+   drawFerns(map)
+   const centerControlDiv = document.createElement("div");
+   const inatMarkersToggleButton = createINatMarkersToggle(map);
+   centerControlDiv.appendChild(inatMarkersToggleButton)
+   map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
+} // initMap
+//------------------------------------------------------------
+async function drawFerns(map)
+{
+  //await readFernData();
+  console.log("report count: " + window.reports.length)
+  let options = google.maps.marker.PinElementOptions
+  const pinBlue = new google.maps.marker.PinElement({ background: "#0000FF" });    
+  let pin = new google.maps.marker.PinElement({
+      scale: 0.5,
+      background: '#FBBC04'
+      });
+
+
+  window.reports.forEach(function(report){
+      var iNatLayer = new google.maps.Data()
+      iNatLayer.setMap(map);
+      window.iNatLayer = iNatLayer;
+      var size = 5; 
+      const pinRed = new google.maps.marker.PinElement({
+           background: "#FF0000",
+           scale: 0.75});    
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: {lat:  report["lat"], lng: report["lon"]},
+          map: map,
+          title: "fump",
+          content: pinRed.element,
+          gmpClickable: true
+          })
+      let infoHTML =  "<h4> fern observation</h4>" +
+             "<ul>" +
+               "<li> by: " + report["user"] +
+               "<li> date: " + report["date"] +
+               "</ul>" +
+               "<p>" + 
+          report["description"] +
+          "<br>" + 
+          "<img src='" + report["url"] + "'>"
+      console.log("description: " + report["description"])
+      let infoWindow = new google.maps.InfoWindow();
+      marker.addListener("click", ({ domEvent, latLng }) => {
+         const {target} = domEvent;
+         infoWindow.close();
+         infoWindow.setContent(infoHTML);
+         //infoWindow.setContent(marker.title);
+         infoWindow.open(marker.map, marker);
+         });
+      iNatMarkers.push(marker)
+      }) // forEach
+
+    } // drawFerns
+//------------------------------------------------------------
+
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkGwPVB2OLaBmQjLQvkoLv5M1ZQU64V7A&callback=initMap&libraries=marker&loading=async">
+    </script>
+  </body>
+</html>

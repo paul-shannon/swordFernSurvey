@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="your-google-maps-container" style="width: 100%; height: 600px"></div>
+
+        <script type="module">
+            // Import MarkerClusterer
+            import { MarkerClusterer } from "https://cdn.skypack.dev/@googlemaps/markerclusterer@2.0.3";
+
+            function initMap() {
+                // Google Maps map
+                const yourMap = new google.maps.Map(document.getElementById("your-google-maps-container"), {
+                    center: { lat: 46.1176208, lng: 14.8671412 },
+                    zoom: 8.5,
+                    disableDefaultUI: true,
+                });
+
+                // Create an array of alphabetical characters to be used to label the markers
+                const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+                // Add markers to the map
+                const yourMarkers = coordinates.map((position, i) => {
+                    const label = labels[i % labels.length];
+
+                    const markerOptions = {
+                        position,
+                        draggable: false,
+                    };
+
+                    // If you want to have different custom icons (e.g., set a custom icon for the first 3 markers)
+                    /*  
+                    if (i < 3) {
+                        markerOptions.icon = {
+                            url: "/path/to/your/icon-group-1.png",
+                            scaledSize: new google.maps.Size(32, 32),
+                        };
+                    }
+                    */
+
+                    const marker = new google.maps.Marker(markerOptions);
+
+                    return marker;
+                });
+
+                // Marker clusterer
+                const yourCluster = new MarkerClusterer({
+                    map: yourMap,
+                    markers: yourMarkers, // yourMarkers.slice(0, 3) if you want to have multiple clusters each with a different custom icon on the same map (e.g., set a clusterer for the first 3 markers)
+                    renderer: {
+                        render: ({ markers, _position: position }) => {
+                            return new google.maps.Marker({
+                                position: {
+                                    lat: position.lat(),
+                                    lng: position.lng(),
+                                },
+                                label: {
+                                    text: String(markers.length),
+                                    color: "black",
+                                },
+                                //icon: "/path/to/your/cluster-icon-1.png",
+                            });
+                        },
+                    },
+                });
+            }
+
+            // Coordinates
+            const coordinates = [
+                { lat: 45.51698897666811, lng: 13.569763482476969, info: "Coordinate 1" },
+                { lat: 45.530799151329255, lng: 13.649157423409125, info: "Coordinate 2" },
+                { lat: 45.52550345079001, lng: 13.597301289331448, info: "Coordinate 3" },
+                { lat: 46.36572773115262, lng: 14.10740802891841, info: "Coordinate 4" },
+                { lat: 46.421743820980616, lng: 15.856193372578861, info: "Coordinate 5" },
+                { lat: 46.68333311555929, lng: 16.220405662581804, info: "Coordinate 6" },
+                { lat: 46.64288069309906, lng: 16.0463909344671, info: "Coordinate 7" },
+            ];
+
+            window.initMap = initMap;
+        </script>
+
+        <!-- Google Maps API -->
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkGwPVB2OLaBmQjLQvkoLv5M1ZQU64V7A&callback=initMap" defer></script>
+    </body>
+</html>

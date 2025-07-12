@@ -2,7 +2,10 @@ library(jsonlite)
 library(sp)
 library(parzer)
 library(RUnit)
+library(yaml)
 options(digits=10)
+#--------------------------------------------------------------------------------
+photoURLs <- yaml.load(readLines("~/github/swordFernSurvey/photos/photo.yaml"))
 #--------------------------------------------------------------------------------
 standardizeLatLong <- function(s)
 {
@@ -62,7 +65,7 @@ test_standardizeLatLong <- function()
   checkEqualsNumeric(x$lon, -121.9919, tol=1e-6)
 
   x.all <- lapply(tbl2$location, standardizeLatLong)
-  browser()
+
   for(x in x.all){
      printf("lat: %f  lon: %f", x$lat, x$lon)
      checkTrue(x$lat > 46)
@@ -107,7 +110,6 @@ test_standardizeUWTable <- function()
     printf("--- test_standardizeUWTable")
 
     tbl3 <- standardizeUWTable(tbl2)
-    browser()
     xyz <- 99
 
 } # test_standardizeUWTable
@@ -119,22 +121,66 @@ runTests <- function()
 
 } # runTests
 #--------------------------------------------------------------------------------
+addPhotoURLs <- function(tbl, photoURLs)
+{
+  photos <- list()
+
+  xyz <- "addPhotoToURLs"
+  for(r in seq_len(nrow(tbl))){
+      siteName <- tbl$siteName[r]
+      if(siteName %in% names(photoURLs)){
+          files <- photoURLs[[siteName]]
+          urls <- paste(sprintf("%s%s", photoURLs$base,
+                                photoURLs[[siteName]]), collapse=" | ")
+         } # siteName found
+      else{
+         urls <- ""
+         }
+     printf("url size: %d", nchar(urls))
+     photos[[siteName]] <- urls
+     } # for
+
+   tbl$photos <- unlist(photos, use.names=FALSE)
+
+   return(tbl)
+
+} # addPhotoURLs
+#--------------------------------------------------------------------------------
 files <- sort(list.files(pattern="*.tsv"))
 tbls <- list()
 for(f in files){
-   file.exists(f)
+   if(f == "uwObs.tsv") next  # we create this here as the output
+   stopifnot(file.exists(f))
+   printf("--- reading %s", f)
    tbl <- read.table(f, sep="\t", comment="", header=TRUE, strip.white=TRUE)
    colnames(tbl)[6:7] <- c("width", "length")
    colnames(tbl)[12:13] <- c("healthyFernCount", "sickOrDeadFernCount")
-   tbl2 <- standardizeUWTable(tbl)
-   tbls[[f]] <- tbl2
+   tbls[[f]] <- tbl
    } # for f
 
 tbl <- do.call(rbind, tbls)
 rownames(tbl) <- NULL
-tbl <- unique(tbl)
-printf("writing %d rows, %d columns to uwObs.json", nrow(tbl), ncol(tbl))
+tbl <- standardizeUWTable(tbl)
+
+#printf("before detecting dups: %d rows", nrow(tbl))
+   # look for duplicates: identical siteName and date
+#print(which(duplicated(tbl[, c("siteName", "date")])))
+dups <- which(duplicated(tbl[, c("siteName", "date")]))
+#printf("length of dups: %d", length(dups))
+if(length(dups) > 0){
+   #printf("before removing dups: %d rows", nrow(tbl))
+   tbl <- tbl[-dups,]
+   #printf("after removing dups: %d rows", nrow(tbl))
+   }
+# tbl <- unique(tbl)
+#printf("before standardizing tbl: %d rows", nrow(tbl))
+
+#printf("before adding photos: %d rows", nrow(tbl))
+tbl <- addPhotoURLs(tbl, photoURLs)
+
+printf("writing %d rows, %d columns to uwObs.tsv and uwObs.json", nrow(tbl), ncol(tbl))
+write.table(tbl, file="uwObs.tsv", sep="\t", col.names=TRUE, quote=FALSE)
 jsonText <- toJSON(tbl)
 writeLines(jsonText, "uwObs.json")
-printf("DO THIS: cp uwObs.json ../../map/current/")
+printf("DO THIS: cp uwObs.json ../map/current/")
 
