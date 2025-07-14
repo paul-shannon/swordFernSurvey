@@ -391,9 +391,30 @@ async function drawUWSites(map)
           content: pinBlue.element,
           gmpClickable: true
           })
+    //console.log("--- photos");
+    const photoString = obs['photos']
+    //console.log(obs["photos"])
     let infoHTML = "<h3>UW observation: ";
       infoHTML += obs['siteName'];
       infoHTML += "</h3>"; 
+      infoHTML += "<ul>";
+      infoHTML += "<li> " + obs['observer'];
+      infoHTML += "<li> " + obs['date'];
+      infoHTML += "<li> " + obs['lat'];
+      infoHTML += "<li> " + obs['lon'];
+      infoHTML += "<li> " + obs['area'] + " sq.ft.";
+      infoHTML += "<li> " + obs['sickOrDeadFernCount'] + " dead fern count";
+      infoHTML += "<li> " + obs['healthyFernCount'] + " healthy fern count";
+      infoHTML += "</ul>";
+      if(photoString != ''){
+          let urls = photoString.split(' | ')
+          //console.log("url count: " + urls.length);
+          urls.forEach(function(url){
+             //console.log(url)
+             infoHTML += '<br><br><img src="' + url + '" width=400>';
+             }) // foreach url
+          } // if photoString
+
       let infoWindow = new google.maps.InfoWindow();
       marker.addListener("click", function(domEvent, latLng){
          const {target} = domEvent;

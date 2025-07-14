@@ -183,4 +183,4 @@ write.table(tbl, file="uwObs.tsv", sep="\t", col.names=TRUE, quote=FALSE)
 jsonText <- toJSON(tbl)
 writeLines(jsonText, "uwObs.json")
 printf("DO THIS: cp uwObs.json ../map/current/")
-
+# system("cp uwObs.json ../map/current")
