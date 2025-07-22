@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="#" />
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+    <title>Fern Reports</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="module">
+      var uwMarkers = [];
+
+//------------------------------------------------------------
+async function readUWData(){
+  try{
+     //const uwObs = await $.getJSON("uwObs.json");
+     const uwObs = $.getJSON("uwObs.json");
+     console.log("uwObs successfully read")
+     return uwObs;
+     } // try
+  catch(error){
+     console.error('Error fetching data:', error);
+  }
+} // readUWData
+//------------------------------------------------------------
+async function initMap() {
+   const {Map} = await google.maps.importLibrary("maps");
+   const {AdvancedMarkerElement, PinElement, InfoWindow} = await google.maps.importLibrary("marker");
+     
+   var map = new google.maps.Map(document.getElementById('map'), {
+       zoom: 7,
+       center: {lat: 47.2277, lng: -122.3555},
+       mapTypeId: google.maps.MapTypeId.TERRAIN,
+       mapId: "DEMO_MAP_ID"
+       });
+
+    map.addListener("click", (mapsMouseEvent) => {
+      console.log(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
+      });
+
+   const uwObs = await readUWData()
+
+   drawUWSites(map, uwObs)
+
+} // initMap
+//------------------------------------------------------------
+      async function drawUWSites(map, uwObs)
+{
+  console.log("uw site count: " + uwObs.length)
+
+  let options = google.maps.marker.PinElementOptions
+  const pinBlue = new google.maps.marker.PinElement({ background: "#0000FF" });    
+  let pin = new google.maps.marker.PinElement({
+      scale: 0.5,
+      background: '#FBBC04'
+      });
+
+  uwObs.forEach(function(obs){
+      var uwLayer = new google.maps.Data()
+      uwLayer.setMap(map);
+      window.uwLayer = uwLayer;
+      const brown = "#734d26"
+      const green = "#009900"; //"#00cc00";
+      let deadSize = obs['sickOrDeadFernCount']
+      if(deadSize == 0){
+         deadSize = 1
+         }
+      deadSize = Math.log(deadSize)/3;
+      const liveSize = 0.7; //obs['healthyFernCount']
+      // console.log("deadSize: " + deadSize);
+      const pinBrown = new google.maps.marker.PinElement({
+           background: brown,  // "#0000FF",
+           glyphColor: brown,
+           borderColor: brown,
+           scale: deadSize});    
+      const pinGreen = new google.maps.marker.PinElement({
+           background: green,
+           glyphColor: green,
+           borderColor: "#000000",
+           scale: liveSize});    
+      let pin = pinBrown;
+      if(obs['sickOrDeadFernCount'] == 0){
+         pin = pinGreen;  
+         }
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: {lat:  obs["lat"], lng: obs["lon"]},
+          map: map,
+          title: obs["siteName"],
+          content: pin.element,
+          gmpClickable: true
+          })
+    //console.log("--- photos");
+    const photoString = obs['photos']
+    //console.log(obs["photos"])
+    let infoHTML = "<h3>UW observation: ";
+      infoHTML += obs['siteName'];
+      infoHTML += "</h3>"; 
+      infoHTML += "<ul>";
+      infoHTML += "<li> " + obs['observer'];
+      infoHTML += "<li> " + obs['date'];
+      infoHTML += "<li> " + obs['lat'];
+      infoHTML += "<li> " + obs['lon'];
+      infoHTML += "<li> " + obs['area'] + " sq.ft.";
+      infoHTML += "<li> " + obs['sickOrDeadFernCount'] + " dead fern count";
+      infoHTML += "<li> " + obs['healthyFernCount'] + " healthy fern count";
+      infoHTML += "</ul>";
+      if(photoString != ''){
+          let urls = photoString.split(' | ')
+          //console.log("url count: " + urls.length);
+          urls.forEach(function(url){
+             //console.log(url)
+             infoHTML += '<br><br><img src="' + url + '" width=400>';
+             }) // foreach url
+          } // if photoString
+
+      let infoWindow = new google.maps.InfoWindow();
+      marker.addListener("click", function(domEvent, latLng){
+         const {target} = domEvent;
+         infoWindow.close();
+         infoWindow.setContent(infoHTML);
+         infoWindow.open(marker.map, marker);
+         });
+      uwMarkers.push(marker)
+      })// forEach
+
+   // var mc = MarkerClusterer(uwMarkers, map);
+   //new markerClusterer.MarkerClusterer({uwMarkers, map})
+   new markerClusterer.MarkerClusterer({uwMarkers, map})
+   //const markerCluster = new MarkerClusterer({map, uwMarkers });
+
+} // drawUWSites
+//------------------------------------------------------------
+window.initMap = initMap;
+
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkGwPVB2OLaBmQjLQvkoLv5M1ZQU64V7A&callback=initMap&libraries=marker&loading=async">
+    </script>
+  </body>
+</html>

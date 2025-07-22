@@ -29,7 +29,15 @@ view:
 	@echo disable CORS in chrome
 	open http://localhost:$(PORT)/map.html
 
+viewBug:
+	@echo disable CORS in chrome
+	open http://localhost:$(PORT)/map-uwOnly.html
+
 viewRemote:
 	open https://pshannon.net/fernSurvey2025
+
+viewBugRemote:
+	scp map-uwOnly.html $(DEST)/bug.html
+	open https://pshannon.net/fernSurvey2025/bug.html
 
 
