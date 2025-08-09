@@ -1,0 +1,110 @@
+---
+title: "Puget Lowland Sword Fern Mortality Study"
+output: html_notebook
+---
+
+## Getting started
+
+The latest version of the field data is stored on my website. read that file into a the standard R data structure the data.frame (a table).
+
+```{r}
+f <- "https://pshannon.net/fernSurvey2025/uwObs.tsv"
+tbl <- read.table(f, sep="\t", header=TRUE, comment="", quote="")
+```
+
+examine the data, make sure it is what you expect.<br>
+first, how many rows, how many columns?
+
+```{r}
+dim(tbl)
+```
+
+what are the column names?
+
+```{r}
+colnames(tbl)
+```
+
+how many sites have no dead ferns? R's subset command is very useful!
+
+```{r}
+nrow(subset(tbl, sickOrDeadFernCount == 0))
+```
+
+now examine the distribution of that variable across the whole dataset.<br>
+first, get a "five-number summary":  
+ 
+ * min
+ * 1st quartile
+ * median
+ * third quartile
+ * max
+   
+
+```{r}
+fivenum(tbl$sickOrDeadFernCount)
+```
+
+now visually:
+
+```{r}
+boxplot(tbl$sickOrDeadFernCount)
+```
+
+and as a histogram:
+
+```{r}
+hist(tbl$sickOrDeadFernCount, breaks=73)
+```
+
+add a column to the table: "fernCount" to simplify later calculations.
+
+```{r}
+fernCount <- tbl$healthyFernCount +  tbl$sickOrDeadFernCount
+tbl$fernCount <- fernCount  
+```
+
+add another column: 'northerly' a number between 0 and 180. This calculation had me confused for a while...
+
+The field data records an aspect of 0 for due north: we want it to be 180
+
+aspect 180 is due south: we want 0
+
+all sites with aspect close to due north (e.g., 10, 350) should be close to 180 (e.g, both of them 170).
+
+northeast and northwest, each being 45 degrees off of north, become 135
+
+The first step is to extract the site aspect values, from the table, as a simple vector of integers:
+
+```{r}
+tmp <- tbl$aspect
+length(tmp)
+```
+
+now find which of those vectors slope to the west, which to the east
+
+```{r}
+west <- which(tmp>180)
+east <- which(tmp <= 180)
+length(west)
+length(east)
+```
+
+now adjust the values so that the follow the scheme described above, where all range between 180 (due north) and 0 (due south)
+
+```{r}
+tmp[west] <- tmp[west] - 180
+tmp[east] <- 180 - tmp[east]
+```
+
+assign these values as a new column in the table, so we can use it in subsequent calculations, for instance, to see if fern mortality associates with northerly slope
+
+```{r}
+tbl$northerly <- tmp
+```
+
+sanity check these steps. how is "northerly" distributed?
+
+```{r}
+hist(tbl$northerly)
+```
