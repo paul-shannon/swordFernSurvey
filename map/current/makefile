@@ -2,7 +2,8 @@ default:
 	@echo venv
 	@echo server
 	@echo view
-	@echo publish
+	@echo publish   # map
+	@echo publishData # uwObs.tsv
 	@echo viewRemote
 
 venv:
@@ -40,4 +41,7 @@ viewBugRemote:
 	scp map-uwOnly.html $(DEST)/bug.html
 	open https://pshannon.net/fernSurvey2025/bug.html
 
+
+publishData:
+	scp uwObs.tsv paulshannnon@pshannon.net:public_html/pshannon.net/fernSurvey2025/
 
