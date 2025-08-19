@@ -25,6 +25,7 @@ publish:
 	scp map.html $(DEST)/index.html
 	scp *.geojson $(DEST)/
 	scp *.json $(DEST)/
+	scp uwObs.tsv $(DEST)/
 
 view:
 	@echo disable CORS in chrome

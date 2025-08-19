@@ -5,22 +5,196 @@
     <meta charset="utf-8">
     <link rel="shortcut icon" href="#" />
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-    <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"  rel="stylesheet">
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <title>Fern Reports</title>
     <style>
       html, body {
         height: 100%;
+        width: 100%;
         margin: 0;
         padding: 0;
       }
       #map {
         height: 100%;
+        }
+      #tableWidget tr td{
+          table-layout:fixed;
+          line-height: 20px;
+          height: 20px; /* Set a fixed height */
+      min-height: 20px; /* Ensure minimum height */
       }
     </style>
   </head>
+
   <body>
-    <div id="map"></div>
-    <script type="module">
+   <div id="tabs" style="height: 100%; width: 100%">
+     <ul>
+       <li><a href="#map">Map</a></li>
+       <li><a href="#tableDiv">Table</a></li>
+       <li><a href="#report">Report</a></li>
+       <li><a href="#download">Download</a></li>
+     </ul>
+     <div id="map"></div>
+     <div id="download" style="margin: 100px; font-size: 32px;">
+       <a href="uwObs.tsv"> uwObs.tsv</a>
+       </div>
+     <div id="tableDiv">
+     <table id="tableWidget" class="display" width="100%">
+        <thead>
+            <tr>
+              <th>observer</th>
+              <th>siteName</th>
+              <th>lat</th>
+              <th>lon</th>
+              <th>date</th>
+              <th>time</th>
+              <th>elevation</th>
+              <th>area</th>
+              <th>width</th>
+              <th>length</th>
+              <th>slope</th>
+              <th>aspect</th>
+              <th>canopyType</th>
+              <th>canopyDensity</th>
+              <th>healthyFernCount</th>
+              <th>sickOrDeadFernCount</th>
+              <th>deadClass1</th>
+              <th>deadClass2</th>
+              <th>deadClass3</th>
+              <th>deadClass4</th>
+              <th>notes</th>
+              <th>mortality</th>
+              <th>fernCount</th>
+              <th>northerly</th>
+            </tr>
+        </thead>
+    </table>
+
+     </div id="tableDiv">
+     <div id="report" style="font-size: 24px; margin: 50px; 	font-family: New York Times-Roman;">
+       <h2>UW/FoSP Puget Lowland Sword Fern Mortality Study </h2>
+      <p>
+       (an early draft)
+
+      <p>
+      A dramatic die-off of the long-lived, robust, drought-tolerant,
+     dominant understory Western Sword Fern of PNW lowland douglas-fir
+     forests (<i>Polystichum munitum</i>) was first reported in 2013
+     in an old-growth urban forest in Seattle, in Seward Park.
+      <p>
+      The sword fern blight has since been observed throughout the Puget Lowlands.
+      Mortality continues at Seward Park
+
+      <p>
+      The cause (or causes) are unknown.  Climate change (recent
+      rise in temperatures, some decrease in rainfall) -
+      may be a factor; however, our data establish that they are highly
+      unlikely to be the proximal cause.  We suspect a perturbed
+      microbime with an unknown vector.
+      <p>
+      Sword ferns regeneration is rare once a forest acquires an
+      overarching canopy.  Infill plant colonization by other native
+      plant species is very slow in sword fern mortality sites.
+      Therefore the loss of this species raises concerns about the
+      long-term health of PNW lowland forests.
+      <p>
+      In the summer of 2025 two student interns from the
+      University of Washington's Program on the Environment joined
+      with the Friends of Seward Park to map the distribution of the
+      sword fern blight across the Puget Lowlands.  Site and fern
+      health status was collected at each site.  A few interesting
+      patterns have emerged in the data.
+      <p>
+      We hope that this report, along with a decade of monitoring and
+      experiments, whose full history is documented
+      <a href="https://pshannon.net/swordFernResearchTimeline/"
+         target="_blank">here</a>, will attract the interest of
+      researchers and provide them with a solid foundation of
+      preliminary data so that the cause/s of the sword fern blight
+         can be understood.
+      
+      
+      
+       
+     </div id="report">
+
+    </div id="tabs">
+
+<script type="module">
+$(function(){
+    console.log("page ready");
+    $("#tabs").tabs();
+    $('#tableWidget').DataTable({
+            bInfo: true,
+            sDom: '<"header">Bfrtip<"footer">',
+            buttons: ['copy', 'csv', 'excel', 'pdf'],
+            pageLength: 1000,
+            ajax: {
+                url: 'uwObs.json',
+                dataSrc: ''
+               },
+            columns: [
+                {data: 'observer', width: '200px'},
+                {data: 'siteName'},
+                {data: 'lat', width: '100px'},
+                {data: 'lon'},
+                {data: 'date'},
+                {data: 'time'},
+                {data: 'elevation'},
+                {data: 'area'},
+                {data: 'width'},
+                {data: 'length'},
+                {data: 'slope'},
+                {data: 'aspect'},
+                {data: 'canopyType'},
+                {data: 'canopyDensity'},
+                {data: 'healthyFernCount'},
+                {data: 'sickOrDeadFernCount'},
+                {data: 'deadClass1'},
+                {data: 'deadClass2'},
+                {data: 'deadClass3'},
+                {data: 'deadClass4'},
+                {data: 'notes'},
+                {data: 'mortality'},
+                {data: 'fernCount'},
+                {data: 'northerly'}
+            ],
+           /*********
+           autoWidth: false,
+          columnDefs: [
+                    { "width": 100, "targets": 0 },
+                    { "width": 10, "targets": 1 },
+                    { "width": 50, "targets": 2 },
+                    { "width": 10, "targets": 3 },
+                    { "width": 20, "targets": 4 },
+                    { "width": 20, "targets": 5 },
+                    { "width": 20, "targets": 6 },
+                    { "width": 20, "targets": 7 },
+                    { "width": 20, "targets": 8 },
+                    { "width": 20, "targets": 9 },
+                    { "width": 20, "targets": 10 },
+                    { "width": 20, "targets": 11 },
+                    { "width": 20, "targets": 12 },
+                    { "width": 20, "targets": 13 },
+                    { "width": 20, "targets": 14 },
+                    { "width": 20, "targets": 15 },
+                    { "width": 20, "targets": 16 },
+                    { "width": 20, "targets": 17 },
+                    { "width": 20, "targets": 18 },
+                    { "width": 20, "targets": 19 },
+                    { "width": 200, "targets": 20 },
+                    { "width": 20, "targets": 21 },
+                    { "width": 20, "targets": 22 },
+                    { "width": 20, "targets": 23 },
+                    ],
+             *********/
+    });
+});
+
+
       var iNatMarkers = [];
       var uwMarkers = [];
       //import {MarkerClusterer} from "@googlemaps/markerclusterer";
@@ -405,7 +579,7 @@ async function drawUWSites(map, uwObs)
           gmpClickable: true
           })
     //console.log("--- photos");
-    const photoString = obs['photos']
+    //const photoString = obs['photos']
     //console.log(obs["photos"])
     let infoHTML = "<h3>UW observation: ";
       infoHTML += obs['siteName'];
@@ -418,18 +592,20 @@ async function drawUWSites(map, uwObs)
       infoHTML += "<li> elevation: " + obs['elevation'];
       infoHTML += "<li> slope: " + obs['slope'];
       infoHTML += "<li> aspect: " + obs['aspect'];
+      infoHTML += "<li> northerly: " + obs['northerly'];
       infoHTML += "<li> area: " + obs['area'] + " sq.ft.";
       infoHTML += "<li> dead fern count: " + obs['sickOrDeadFernCount'];
       infoHTML += "<li> healthy fern count: " + obs['healthyFernCount'];
       infoHTML += "<li> mortality rate: " + obs['mortality'];
       infoHTML += "<li> canopy type: " + obs['canopyType'];
       infoHTML += "<li> canopy density: " + obs['canopyDensity'];
-      infoHTML += "<li> dead class 1: " + obs['dead.Class.1'];
-      infoHTML += "<li> dead class 2: " + obs['dead.Class.2'];
-      infoHTML += "<li> dead class 3: " + obs['dead.Class.3'];
-      infoHTML += "<li> dead class 4: " + obs['dead.Class.4'];
+      infoHTML += "<li> dead class 1: " + obs['deadClass1'];
+      infoHTML += "<li> dead class 2: " + obs['deadClass2'];
+      infoHTML += "<li> dead class 3: " + obs['deadClass3'];
+      infoHTML += "<li> dead class 4: " + obs['deadClass4'];
       infoHTML += "<li> notes: " + obs['notes'];
       infoHTML += "</ul>";
+      /*********
       if(photoString != ''){
           let urls = photoString.split(' | ')
           //console.log("url count: " + urls.length);
@@ -438,7 +614,7 @@ async function drawUWSites(map, uwObs)
              infoHTML += '<br><br><img src="' + url + '" width=400>';
              }) // foreach url
           } // if photoString
-
+      ********/
       let infoWindow = new google.maps.InfoWindow();
       marker.addListener("click", function(domEvent, latLng){
          const {target} = domEvent;
@@ -451,7 +627,7 @@ async function drawUWSites(map, uwObs)
 
    // var mc = MarkerClusterer(uwMarkers, map);
    //new markerClusterer.MarkerClusterer({uwMarkers, map})
-   new markerClusterer.MarkerClusterer({uwMarkers, map})
+   //new markerClusterer.MarkerClusterer({uwMarkers, map})
    //const markerCluster = new MarkerClusterer({map, uwMarkers });
 
 } // drawUWSites
