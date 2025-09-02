@@ -1,11 +1,8 @@
-git add audubonProject-makeMap.R
-git add chiSquareTest.R
-git add ferns.json
-git add ferns.tsv
-git add fromBen-raw.tsv
-git add fromBen.tsv
-git add fromBen.xlsx
-git add junk
-git add makefile
-git add map/
-git add transformDataToLatLong.R
+	git add  ferns.json
+	git add  ferns.tsv
+	git add  junk
+	git add  map/ferns.json
+	git add  map/ferns.tsv
+	git add  map/map.js
+	git add  transformDataToLatLong.R
+

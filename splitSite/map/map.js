@@ -28,9 +28,6 @@ function readPointData(){
 
    } // readPointData
 
-
-// await readPointData()
-
 $(document).ready(function(){
   readPointData()
 });
@@ -86,8 +83,6 @@ async function drawPoints(map){
                     fillColor: newColor,
                     strokeColor: '#000',
                     }
-      //console.log("----- new fern, its data:")
-      //console.log(fern['lat'] + "  " + fern['lon'] + ":  " + fern['status'])
       let marker = new google.maps.Marker({
            position: {lat:  fern["lat"], lng: fern["lon"]},
            map,
@@ -95,27 +90,28 @@ async function drawPoints(map){
            icon: icon
            })
        }) // forEach
+ 
+    // log center:    (47.5560358, -122.2532737)
 
-    setInterval(function(){
-       navigator.geolocation.getCurrentPosition(function(pos){
-           var latLng = {"lat": pos.coords.latitude, "lng": pos.coords.longitude};
-           if(typeof(locationMarker) == "undefined"){
-              locationMarker = new google.maps.Marker({
-                 position: mapCenter,
-                 map: map,
-                 icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 10,
-                    fillOpacity: 1,
-                    strokeWeight: 1,
-                    fillColor: '#5384ED',
-                    strokeColor: '#ffffff',
-                    },
-                 });
-           locationMarker.setPosition(latLng)
-           }
-         })
-      }, 1000);
+       const tiltedRectangleCoords = [
+           {lat: 47.556026, lng: -122.253214},
+           {lat: 47.556136, lng: -122.253386},
+           {lat: 47.556140, lng: -122.253379},
+           {lat: 47.556029, lng: -122.253207}]
+
+
+    const tiltedRectangle = new google.maps.Polygon({
+        paths: tiltedRectangleCoords,
+        strokeColor: 'brown', //'#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: 'brown', //'#FF0000',
+        fillOpacity: 0.5
+    });
+    
+    // Set the map for the polygon
+    tiltedRectangle.setMap(map);
+    
 
 } // drawPoints
 //--------------------------------------------------------------------------------
