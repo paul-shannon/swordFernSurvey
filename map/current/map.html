@@ -26,6 +26,31 @@
           height: 20px; /* Set a fixed height */
       min-height: 20px; /* Ensure minimum height */
       }
+   .circle-marker-brown {
+      width: 30px; /* Adjust size as needed */
+      height: 30px; /* Must match width for a circle */
+      background-color: brown; /* Red color, change as needed */
+      border-radius: 50%; /* This makes it a circle */
+      color: white; /* Text color */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+   .circle-marker-green {
+      width: 30px; /* Adjust size as needed */
+      height: 30px; /* Must match width for a circle */
+      background-color: green; /* Red color, change as needed */
+      border-radius: 50%; /* This makes it a circle */
+      color: white; /* Text color */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
     </style>
   </head>
 
@@ -408,8 +433,9 @@ async function initMap() {
    // import { MarkerClusterer } from "@googlemaps/markerclusterer";
      
    var map = new google.maps.Map(document.getElementById('map'), {
-       zoom: 7,
-       center: {lat: 47.2277, lng: -122.3555},
+       zoom: 8.5,
+       //center: {lat: 47.2277, lng: -122.3555},
+       center: {lat: 47.79249033556582, lng: -122.11080200294857},
        mapTypeId: google.maps.MapTypeId.TERRAIN,
        mapId: "DEMO_MAP_ID"
        });
@@ -552,9 +578,9 @@ async function drawUWSites(map, uwObs)
       const green = "#009900"; //"#00cc00";
       let deadSize = obs['sickOrDeadFernCount']
       if(deadSize == 0){
-         deadSize = 1
+         deadSize = 1;
          }
-      deadSize = Math.log(deadSize)/3;
+      deadSize = Math.log(deadSize)/8;
       const liveSize = 0.7; //obs['healthyFernCount']
       // console.log("deadSize: " + deadSize);
       const pinBrown = new google.maps.marker.PinElement({
@@ -567,17 +593,29 @@ async function drawUWSites(map, uwObs)
            glyphColor: green,
            borderColor: "#000000",
            scale: liveSize});    
-      let pin = pinBrown;
+      let markerClass = "circle-marker-brown";
+      let markerColor = brown;
+      let markerSize = deadSize;
       if(obs['sickOrDeadFernCount'] == 0){
-         pin = pinGreen;  
+          markerClass = "circle-marker-green";
+          markerColor = green;
+          markerSize = 0.7;
          }
+      const markerContent = document.createElement("div");
+      //markerContent.id = "uwMarker"
+      markerContent.setAttribute("id", "uwMarker");
+      markerContent.classList.add(markerClass)
+      markerContent.style.scale = markerSize;
+      markerContent.style.backgroundColor = markerColor;
       const marker = new google.maps.marker.AdvancedMarkerElement({
           position: {lat:  obs["lat"], lng: obs["lon"]},
           map: map,
           title: obs["siteName"],
-          content: pin.element,
+          content: markerContent,
           gmpClickable: true
           })
+      window.x = markerContent;
+      window.y = marker;
     //console.log("--- photos");
     //const photoString = obs['photos']
     //console.log(obs["photos"])

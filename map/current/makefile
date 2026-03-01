@@ -7,7 +7,7 @@ default:
 	@echo viewRemote
 
 venv:
-	@echo source /Users/paul/github/slexil2/py3105slexil/bin/activate
+	@echo source /Users/paul/github/slexil2/py3119slexil/bin/activate
 
 PORT=8012
 
